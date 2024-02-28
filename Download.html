@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counter </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* CSS untuk wadah daftar pelanggan */
+        #daftar-pelanggan-container {
+            max-width: 850px; /* Lebar maksimal diperbesar */
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #f9f9f9;
+            font-family: Arial, sans-serif;
+            position: relative; /* Tambahkan untuk penempatan absolut */
+            transition: filter 0.3s;
+        }
+
+        /* CSS lainnya */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px; /* Ukuran teks di dalam tabel */
+        }
+        #form-tambah-pelanggan {
+            display: none;
+            margin-bottom: 20px;
+        }
+        .btn-tambah-pelanggan, .btn-submit, .btn-salin {
+            background-color: #007bff; /* Warna biru untuk tombol tambahkan pelanggan dan confirmasi */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            transition: background-color 0.3s;
+        }
+        .btn-tambah-pelanggan:hover, .btn-submit:hover, .btn-salin:hover {
+            background-color: #0056b3; /* Warna biru lebih gelap saat hover */
+        }
+        .btn-hapus {
+            background-color: #FF0000; /* Warna merah untuk tombol hapus */
+            color: white;
+            padding: 10px 20px;
+            margin-left: 5px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            transition: background-color 0.3s;
+        }
+        .btn-hapus:hover {
+            background-color: #FF3333; /* Warna merah lebih terang saat hover */
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        .error-message {
+            color: red;
+        }
+
+        /* Responsif di perangkat mobile */
+        @media screen and (max-width: 600px) {
+            .btn-tambah-pelanggan {
+                width: 100%;
+            }
+            #form-tambah-pelanggan {
+                width: 100%;
+            }
+        }
+
+/* CSS untuk ikon services */
+        .icon-menu {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            margin-left: 5px;
+            color: #898b8e;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .icon-menu.active ~ .icon-services,
+        .icon-menu.active ~ .icon-trash {
+            display: block;
+        }
+
+        /* CSS untuk ikon tongsampah dan panduan penggunaan fitur */
+/* CSS untuk ikon panduan penggunaan fitur */
+.icon-services {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 80px; /* Mengatur posisi ikon services ke kiri */
+    color: #007bff;
+    font-size: 24px;
+    cursor: pointer;
+
+}
+
+/* CSS untuk ikon tongsampah */
+.icon-trash {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 50px; /* Mengatur posisi ikon tongsampah */
+    color: red;
+    
+    font-size: 24px;
+    cursor: pointer;
+}
+
+        /* CSS untuk efek blur saat popup ditampilkan */
+        .popup-open #daftar-pelanggan-container {
+            filter: blur(5px);
+        }
+
+        /* CSS untuk popup panduan penggunaan fitur */
+        .popup-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.2); /* Transparansi hitam */
+            z-index: 999;
+        }
+        .popup-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            max-width: 100%;
+            max-height: 600px; /* Tentukan tinggi maksimal popup */
+            overflow-y: auto; /* Aktifkan scrollbar vertikal jika konten melebihi tinggi popup */
+            padding-right: 20px; /* Tambahkan padding di sebelah kanan untuk memberi ruang bagi scrollbar */
+        }
+        .popup-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 25px;
+            color: #888;
+        }
+
+        /* Efek blur saat popup ditampilkan */
+        .popup-open #daftar-pelanggan-container {
+            filter: blur(5px); /* Menambahkan efek blur */
+        }
+        
+        .popup-content img{
+          margin-top: 20px;
+          width: 100%;
+        }
+        
+        .popup-content a {
+          font-size: 13px;
+         margin-top: 10px;
+        }
+        
+        h2 {
+          margin-top: 50px;
+        }
+        
+        #input-pencarian {
+          margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+  
+  
+<div id="daftar-pelanggan-container">
+        <i class="fas fa-bars icon-menu" onclick="toggleMenu()"></i> <!-- Icon menu di pojok kanan atas -->
+        <i class="fas fa-concierge-bell icon-services" onclick="tampilkanPopupPanduan()"></i> <!-- Icon services -->
+        <i class="fas fa-trash-alt icon-trash" onclick="tampilkanKonfirmasiHapus()"></i> <!-- Icon tongsampah -->
+        <!-- Konten lainnya -->
+        <h2>Credit Counter</h2>
+        <button class="btn-tambah-pelanggan"><i class="fas fa-plus"></i> Add Costumer</button>
+<form id="form-tambah-pelanggan">
+
+    <!-- Input Nama dan Nomor HP -->
+    <label for="nama">Name:</label>
+    <input type="text" id="nama" name="nama" class="form-control" required>
+    <span class="error-message" id="error-nama"></span>
+    <label for="nomor-hp">Phone:</label>
+    <input type="text" id="nomor-hp" name="nomor-hp" class="form-control" required>
+    <span class="error-message" id="error-nomor-hp"></span>
+    <!-- Tombol Confirm -->
+    <button type="submit" class="btn-submit">Save</button>
+</form>
+
+       
+        <input type="text" id="input-pencarian" class="form-control" placeholder="Search name...">
+
+        <h2>List Costumer</h2>
+        <table id="daftar-pelanggan">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Pelanggan akan ditampilkan di sini -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Popup panduan penggunaan fitur -->
+    <div id="popup-panduan" class="popup-container">
+        <div class="popup-content">
+            <span class="popup-close" onclick="sembunyikanPopupPanduan()">&times;</span>
+            <h2>Panduan Penggunaan Fitur</h2>
+            
+            <hr>
+            
+            <!-- fitur tambah pelanggan --> 
+            <p style="font-weight: bold;">Fitur Tambah Pelanggan</p>
+           
+            <img src="FOTO/tambah pelanggan.jpg">
+            <a>1. Klik +Tambah Pelanggan Untuk menambahkan pelanggan</a> 
+            
+            <img src="FOTO/tambah pelanggan nama.jpg">
+            <a>2. Isi nama hanya menggunakan huruf tidak bisa menggunakan simbol maupun nomor, dan maksimal 20 huruf</a> 
+             
+             <img src="FOTO/tambah pelanggan no hp.jpg">
+             <a>3. Isi nomor hp pelanggan hanya menggunakan nomor tidak bisa menggunakan simbol maupun huruf, dan maksimal 20 nomor</a>
+            
+             
+             <img src="FOTO/tambah pelanggan konfirmasi.jpg">
+             <a>4. Ketika sudah mengisi nama dan nomor hp selanjutnya tekan tombol confirm </a>
+             
+            
+            <img src="FOTO/hasil tambah pelanggan.jpg">
+            <a>5. Ketika sudah mengisi nama dan nomor hp selanjutnya tekan tombol confirm </a> <hr>
+            
+            
+            <!-- fitur Pencarian--> 
+            <p style="font-weight: bold;">Fitur Pencarian</p>
+           
+            <img src="FOTO/pencarian.jpg">
+            <a>Ketik nama di dalam kolom pencarian, jika nama tersebut tercantum di daftar maka background nama akan berwarna biru, jika nama tidak tercantum maka tidak ada nama yang berwarna biru </a> <hr>
+            
+            
+            
+         <!-- fitur Salin--> 
+            <p style="font-weight: bold;">Fitur Salin</p>
+            <img src="FOTO/salin daftar.jpg">
+            <a>1. Tekan tombol salin untuk menyalin nomor yang ada di daftar</a> 
+             
+             <img src="FOTO/hasil salin daftar.jpg">
+             <a>2. Jika berhasil maka akan muncul notifikasi</a> <hr>
+            
+             <!-- fitur hapus--> 
+             <p style="font-weight: bold;">Fitur Hapus</p>
+             <img src="FOTO/hapus daftar.jpg">
+             <a>1. klik icon tersebut untuk menghapus daftar, maka akan muncul notifikasi </a>
+             
+             <img src="FOTO/hasil hapus daftar.jpg">
+             <a>2. Sesi konfirmasi, jika tidak jadi mengahpus daftar pelanggan klik tombol batal maka daftar tidak akan terhapus, Klik Ok untuk Menghapus daftar pelanggan</a>
+        </div>
+    </div>
+
+    <script>
+        const btnTambahPelanggan = document.querySelector('.btn-tambah-pelanggan');
+        const formTambahPelanggan = document.getElementById('form-tambah-pelanggan');
+        const daftarPelanggan = document.getElementById('daftar-pelanggan');
+        const inputPencarian = document.getElementById('input-pencarian');
+
+        function muatPelanggan() {
+            const dataPelanggan = localStorage.getItem('pelanggan');
+            if (dataPelanggan) {
+                const pelanggan = JSON.parse(dataPelanggan);
+                for (const pelangganItem of pelanggan) {
+                    tambahkanBarisPelanggan(pelangganItem.nama, pelangganItem.nomorHp);
+                }
+            }
+        }
+
+        function simpanPelanggan(pelanggan) {
+            localStorage.setItem('pelanggan', JSON.stringify(pelanggan));
+        }
+
+        function tambahkanBarisPelanggan(nama, nomorHp) {
+            const barisBaru = daftarPelanggan.insertRow();
+            const selNama = barisBaru.insertCell();
+            const selNomorHp = barisBaru.insertCell();
+            const selAksi = barisBaru.insertCell();
+            selNama.textContent = nama;
+            selNomorHp.textContent = nomorHp;
+            const tombolHapus = document.createElement('button');
+            tombolHapus.innerHTML = '<i class="fas fa-trash-alt"></i>'; // Ubah tombol hapus menjadi icon tempat sampah
+            tombolHapus.className = 'btn-hapus';
+            tombolHapus.addEventListener('click', function() {
+                hapusPelanggan(nama, nomorHp, barisBaru);
+            });
+            const tombolSalin = document.createElement('button');
+            tombolSalin.innerHTML = '<i class="far fa-copy"></i>';
+            tombolSalin.className = 'btn-salin';
+            tombolSalin.addEventListener('click', function() {
+                salinNomorHp(nomorHp);
+            });
+            selAksi.appendChild(tombolSalin);
+            selAksi.appendChild(tombolHapus);
+        }
+
+        function hapusPelanggan(nama, nomorHp, barisBaru) {
+            const konfirmasi = confirm('Apakah Anda yakin untuk menghapus?');
+            if (konfirmasi) {
+                const dataPelanggan = JSON.parse(localStorage.getItem('pelanggan'));
+                const pelangganBaru = dataPelanggan.filter(pelanggan => !(pelanggan.nama === nama && pelanggan.nomorHp === nomorHp));
+                simpanPelanggan(pelangganBaru);
+                barisBaru.remove();
+            }
+        }
+
+        function salinNomorHp(nomorHp) {
+            navigator.clipboard.writeText(nomorHp);
+            alert('Nomor HP telah disalin!');
+        }
+
+        function cariPelanggan() {
+            const kataKunci = inputPencarian.value.trim().toLowerCase();
+            if (kataKunci === "") {
+                hapusPenyorotan();
+                return;
+            }
+            const barisPelanggan = daftarPelanggan.getElementsByTagName('tr');
+            let ditemukan = false;
+            for (let i = 0; i < barisPelanggan.length; i++) {
+                const nama = barisPelanggan[i].getElementsByTagName('td')[0];
+                if (nama) {
+                    const teksNama = nama.textContent || nama.innerText;
+                    if (teksNama.toLowerCase().includes(kataKunci)) {
+                        barisPelanggan[i].style.backgroundColor = "#add8e6";
+                        barisPelanggan[i].scrollIntoView({ behavior: "smooth" });
+                        ditemukan = true;
+                    } else {
+                        barisPelanggan[i].style.backgroundColor = "";
+                    }
+                }
+            }
+            if (!ditemukan) {
+                hapusPenyorotan();
+            }
+        }
+
+        function hapusPenyorotan() {
+            const barisPelanggan = daftarPelanggan.getElementsByTagName('tr');
+            for (let i = 0; i < barisPelanggan.length; i++) {
+                barisPelanggan[i].style.backgroundColor = "";
+            }
+        }
+
+        muatPelanggan();
+
+        btnTambahPelanggan.addEventListener('click', function() {
+            formTambahPelanggan.style.display = "block";
+            btnTambahPelanggan.style.display = "none"; // Sembunyikan tombol tambahan pelanggan saat form ditampilkan
+        });
+
+        formTambahPelanggan.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const namaInput = document.getElementById('nama');
+            const nomorHpInput = document.getElementById('nomor-hp');
+
+            const namaValue = namaInput.value.trim();
+            const nomorHpValue = nomorHpInput.value.trim();
+
+            // Validasi Nama
+            const isValidNama = /^[a-zA-Z ]+$/.test(namaValue) && namaValue.length <= 20;
+            if (!isValidNama) {
+                document.getElementById('error-nama').textContent = "Nama harus berupa huruf dan maksimal 20 karakter.";
+                return;
+            } else {
+                document.getElementById('error-nama').textContent = "";
+            }
+
+            // Validasi Nomor HP
+            const isValidNomorHp = /^[0-9]+$/.test(nomorHpValue) && nomorHpValue.length <= 20;
+            if (!isValidNomorHp) {
+                document.getElementById('error-nomor-hp').textContent = "Nomor HP harus berupa angka dan maksimal 20 karakter.";
+                return;
+            } else {
+                document.getElementById('error-nomor-hp').textContent = "";
+            }
+
+            // Cek apakah nama atau nomor HP sudah ada
+            const dataPelanggan = JSON.parse(localStorage.getItem('pelanggan')) || [];
+            const duplicatePelanggan = dataPelanggan.find(pelanggan => pelanggan.nama === namaValue || pelanggan.nomorHp === nomorHpValue);
+            if (duplicatePelanggan) {
+                alert(`Sudah terdaftar\nNama: ${duplicatePelanggan.nama}\nNomor HP: ${duplicatePelanggan.nomorHp}`);
+                return;
+            }
+
+            // Lakukan sesuatu dengan data yang valid, misalnya tambahkan pelanggan ke daftar
+            tambahkanBarisPelanggan(namaValue, nomorHpValue);
+            dataPelanggan.push({ nama: namaValue, nomorHp: nomorHpValue });
+            simpanPelanggan(dataPelanggan);
+            formTambahPelanggan.reset();
+            formTambahPelanggan.style.display = "none";
+            btnTambahPelanggan.style.display = "block"; // Tampilkan kembali tombol tambahan pelanggan setelah form ditutup
+        });
+
+        inputPencarian.addEventListener('input', cariPelanggan);
+
+        function tampilkanPopupPanduan() {
+            document.body.classList.add('popup-open'); // Menambahkan kelas untuk efek blur
+            document.getElementById('popup-panduan').style.display = 'block';
+        }
+
+        function sembunyikanPopupPanduan() {
+            document.body.classList.remove('popup-open'); // Menghapus kelas untuk efek blur
+            document.getElementById('popup-panduan').style.display = 'none';
+        }
+
+        function tampilkanKonfirmasiHapus() {
+            const kode = prompt("Masukkan kode verifikasi untuk menghapus daftar pelanggan:");
+            if (kode === "050828") {
+                const konfirmasi = confirm("Apakah Anda yakin ingin menghapus semua daftar pelanggan?");
+                if (konfirmasi) {
+                    localStorage.removeItem('pelanggan');
+                    document.getElementById('daftar-pelanggan').innerHTML = ''; // Menghapus semua data dari tabel
+                }
+            } else {
+                alert("Kode verifikasi salah. Daftar pelanggan tidak akan dihapus.");
+            }
+        }
+        
+                function toggleMenu() {
+            const menuIcon = document.querySelector('.icon-menu');
+            menuIcon.classList.toggle('active');
+        }
+
+        function tampilkanPopupPanduan() {
+            document.body.classList.add('popup-open'); // Menambahkan kelas untuk efek blur
+            document.getElementById('popup-panduan').style.display = 'block';
+        }
+
+        function tampilkanKonfirmasiHapus() {
+    const kode = prompt("Masukkan kode verifikasi untuk menghapus daftar pelanggan:");
+    if (kode === "050828") {
+        const konfirmasi = confirm("Apakah Anda yakin ingin menghapus semua daftar pelanggan?");
+        if (konfirmasi) {
+            localStorage.removeItem('pelanggan');
+            // Hapus baris kecuali baris pertama (judul tabel)
+            const rows = document.querySelectorAll("#daftar-pelanggan tr");
+            for (let i = 1; i < rows.length; i++) {
+                rows[i].remove();
+            }
+            location.reload(); // Perbarui halaman
+        }
+    } else {
+        alert("Kode verifikasi salah. Daftar pelanggan tidak akan dihapus.");
+    }
+}
+
+    </script>
+</body>
+</html>
