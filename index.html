@@ -403,9 +403,9 @@
             }
 
             // Validasi Nomor HP
-            const isValidNomorHp = /^[0-9]+$/.test(nomorHpValue) && nomorHpValue.length <= 10;
+            const isValidNomorHp = /^[0-9]+$/.test(nomorHpValue) && nomorHpValue.length <= 15;
             if (!isValidNomorHp) {
-                document.getElementById('error-nomor-hp').textContent = "Nomor HP harus berupa angka dan maksimal 10 karakter.";
+                document.getElementById('error-nomor-hp').textContent = "Nomor HP harus berupa angka dan maksimal 15 karakter.";
                 return;
             } else {
                 document.getElementById('error-nomor-hp').textContent = "";
