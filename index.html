@@ -394,18 +394,18 @@
             const nomorHpValue = nomorHpInput.value.trim();
 
             // Validasi Nama
-            const isValidNama = /^[a-zA-Z ]+$/.test(namaValue) && namaValue.length <= 20;
+            const isValidNama = /^[a-zA-Z ]+$/.test(namaValue) && namaValue.length <= 10;
             if (!isValidNama) {
-                document.getElementById('error-nama').textContent = "Nama harus berupa huruf dan maksimal 20 karakter.";
+                document.getElementById('error-nama').textContent = "Nama harus berupa huruf dan maksimal 10 karakter.";
                 return;
             } else {
                 document.getElementById('error-nama').textContent = "";
             }
 
             // Validasi Nomor HP
-            const isValidNomorHp = /^[0-9]+$/.test(nomorHpValue) && nomorHpValue.length <= 20;
+            const isValidNomorHp = /^[0-9]+$/.test(nomorHpValue) && nomorHpValue.length <= 10;
             if (!isValidNomorHp) {
-                document.getElementById('error-nomor-hp').textContent = "Nomor HP harus berupa angka dan maksimal 20 karakter.";
+                document.getElementById('error-nomor-hp').textContent = "Nomor HP harus berupa angka dan maksimal 10 karakter.";
                 return;
             } else {
                 document.getElementById('error-nomor-hp').textContent = "";
